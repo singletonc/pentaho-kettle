@@ -689,6 +689,9 @@ public class Spoon extends ApplicationWindow implements AddUndoPositionInterface
       GUIFactory.setThreadDialogs( new ThreadGuiResources() );
 
       staticSpoon.setArguments( args.toArray( new String[ args.size() ] ) );
+
+      SafeSpoonSharer.setSpoon(staticSpoon);//Added by Charles for SWTBot
+
       staticSpoon.start();
 
     } catch ( Throwable t ) {

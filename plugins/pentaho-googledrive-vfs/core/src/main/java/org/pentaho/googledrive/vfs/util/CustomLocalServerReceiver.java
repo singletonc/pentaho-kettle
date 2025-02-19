@@ -24,10 +24,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.Request;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.webapp.WebAppContext;
 
 public class CustomLocalServerReceiver implements VerificationCodeReceiver {
 
@@ -65,7 +65,7 @@ public class CustomLocalServerReceiver implements VerificationCodeReceiver {
       c.setHost( this.host );
     }
 
-    this.server.addHandler( new CustomLocalServerReceiver.CallbackHandler() );
+    this.server.setHandler( new CustomLocalServerReceiver.CallbackHandler() ); //addHandler( new CustomLocalServerReceiver.CallbackHandler() );
 
     try {
       this.server.start();

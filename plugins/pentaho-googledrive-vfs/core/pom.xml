@@ -16,7 +16,7 @@
 
     <properties>
         <project.http.version>1.42.3</project.http.version>
-        <project.oauth.version>1.22.0</project.oauth.version>
+        <project.oauth.version>1.38.0</project.oauth.version>
         <!--project.build.sourceEncoding>UTF-8</project.build.sourceEncoding-->
         <project.junit.version>4.4</project.junit.version>
         <pdi.version>10.3.0.0-SNAPSHOT</pdi.version>
@@ -39,7 +39,7 @@
         <dependency>
             <groupId>com.google.apis</groupId>
             <artifactId>google-api-services-drive</artifactId>
-            <version>v3-rev77-1.22.0</version>
+            <version>v3-rev197-1.25.0</version>
         </dependency>
         <dependency>
             <groupId>com.google.http-client</groupId>

@@ -9,6 +9,10 @@
     <version>10.3.0.0-SNAPSHOT</version>
   </parent>
 
+  <properties>
+    <google.oauth.version>1.38.0</google.oauth.version>
+  </properties>
+
   <artifactId>google-analytics</artifactId>
   <version>10.3.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>

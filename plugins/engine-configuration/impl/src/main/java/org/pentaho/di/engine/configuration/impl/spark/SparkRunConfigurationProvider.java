@@ -28,6 +28,7 @@ import org.pentaho.di.core.service.PluginServiceLoader;
 import org.pentaho.di.engine.configuration.api.RunConfiguration;
 import org.pentaho.di.engine.configuration.api.RunConfigurationExecutor;
 import org.pentaho.di.engine.configuration.api.RunConfigurationProvider;
+import org.pentaho.di.engine.configuration.impl.CheckedMetaStoreSupplier;
 import org.pentaho.di.engine.configuration.impl.MetaStoreRunConfigurationFactory;
 import org.pentaho.di.trans.TransMeta;
 import org.pentaho.metastore.api.exceptions.MetaStoreException;
@@ -65,8 +66,8 @@ public class SparkRunConfigurationProvider extends MetaStoreRunConfigurationFact
     this.sparkRunConfigurationExecutor = SparkRunConfigurationExecutor.getInstance();
   }
 
-  public SparkRunConfigurationProvider( MetastoreLocator metastoreLocator ) {
-    super( metastoreLocator::getMetastore );
+  public SparkRunConfigurationProvider( CheckedMetaStoreSupplier metastoreSupplier ) {
+    super( metastoreSupplier );
     this.sparkRunConfigurationExecutor = SparkRunConfigurationExecutor.getInstance();
   }
 

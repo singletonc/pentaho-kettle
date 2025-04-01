@@ -31,40 +31,12 @@ public class EmbeddedRunConfigurationManager {
     DefaultRunConfigurationProvider defaultRunConfigurationProvider =
       new DefaultRunConfigurationProvider( () -> embeddedMetaStore );
     SparkRunConfigurationProvider sparkRunConfigurationProvider =
-    new SparkRunConfigurationProvider( createMetastoreLocator( embeddedMetaStore ) );
+    new SparkRunConfigurationProvider( () -> embeddedMetaStore );
     List<RunConfigurationProvider> runConfigurationProviders = new ArrayList<>();
     runConfigurationProviders.add( defaultRunConfigurationProvider );
     runConfigurationProviders.add( sparkRunConfigurationProvider );
 
     return new RunConfigurationManager( runConfigurationProviders );
   }
-
-
-  private static MetastoreLocator createMetastoreLocator(IMetaStore embeddedMetaStore ) {
-    return new MetastoreLocator() {
-
-      @Override
-      public IMetaStore getMetastore( String providerKey ) {
-        return embeddedMetaStore;
-      }
-
-      @Override
-      public IMetaStore getMetastore() {
-        return embeddedMetaStore;
-      }
-
-      @Override public String setEmbeddedMetastore( IMetaStore metastore ) {
-        return null;
-      }
-
-      @Override public void disposeMetastoreProvider( String providerKey ) {
-
-      }
-      @Override public IMetaStore getExplicitMetastore( String providerKey ) {
-        return null;
-      }
-    };
-  }
-
 }
 

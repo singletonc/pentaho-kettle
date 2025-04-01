@@ -52,12 +52,11 @@ public class RunConfigurationManagerTest {
 
     MemoryMetaStore memoryMetaStore = new MemoryMetaStore();
     CheckedMetaStoreSupplier metastoreSupplier = () -> memoryMetaStore;
-    MetastoreLocator metastoreLocator = createMetastoreLocator( memoryMetaStore );
     DefaultRunConfigurationProvider defaultRunConfigurationProvider =
       new DefaultRunConfigurationProvider( metastoreSupplier );
 
     SparkRunConfigurationProvider sparkRunConfigurationProvider =
-    new SparkRunConfigurationProvider( metastoreLocator );
+    new SparkRunConfigurationProvider( metastoreSupplier );
 
     List<RunConfigurationProvider> runConfigurationProviders = new ArrayList<>();
     runConfigurationProviders.add( sparkRunConfigurationProvider );
@@ -158,14 +157,13 @@ public class RunConfigurationManagerTest {
   @Test
   public void testOrdering() {
     MemoryMetaStore memoryMetaStore = new MemoryMetaStore();
-    MetastoreLocator metastoreLocator = createMetastoreLocator( memoryMetaStore );
     CheckedMetaStoreSupplier metastoreSupplier = () -> memoryMetaStore;
     DefaultRunConfigurationProvider defaultRunConfigurationProvider =
       new DefaultRunConfigurationProvider( metastoreSupplier );
 
     SparkRunConfigurationProvider sparkRunConfigurationProvider =
             null;
-    sparkRunConfigurationProvider = new SparkRunConfigurationProvider( metastoreLocator );
+    sparkRunConfigurationProvider = new SparkRunConfigurationProvider( metastoreSupplier );
 
     List<RunConfigurationProvider> runConfigurationProviders = new ArrayList<>();
     runConfigurationProviders.add( sparkRunConfigurationProvider );
@@ -211,31 +209,4 @@ public class RunConfigurationManagerTest {
     assertEquals( "x", names.get( 4 ) );
     assertEquals( "z", names.get( 5 ) );
   }
-
-  private static MetastoreLocator createMetastoreLocator( IMetaStore memoryMetaStore ) {
-    return new MetastoreLocator() {
-
-      @Override
-      public IMetaStore getMetastore( String providerKey ) {
-        return memoryMetaStore;
-      }
-
-      @Override
-      public IMetaStore getMetastore() {
-        return memoryMetaStore;
-      }
-
-      @Override public String setEmbeddedMetastore( IMetaStore metastore ) {
-        return null;
-      }
-
-      @Override public void disposeMetastoreProvider( String providerKey ) {
-      }
-
-      @Override public IMetaStore getExplicitMetastore(String providerKey ) {
-        return null;
-      }
-    };
-  }
-
 }

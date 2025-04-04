@@ -15,14 +15,18 @@ package org.pentaho.di.engine.configuration.impl;
 
 import org.pentaho.di.core.bowl.Bowl;
 import org.pentaho.di.core.bowl.DefaultBowl;
+import org.pentaho.di.core.service.PluginServiceLoader;
 import org.pentaho.di.engine.configuration.api.RunConfiguration;
 import org.pentaho.di.engine.configuration.api.RunConfigurationExecutor;
 import org.pentaho.di.engine.configuration.api.RunConfigurationProvider;
 import org.pentaho.di.engine.configuration.api.RunConfigurationService;
 import org.pentaho.di.engine.configuration.impl.pentaho.DefaultRunConfigurationProvider;
-import org.pentaho.di.engine.configuration.impl.spark.SparkRunConfigurationProvider;
+import org.pentaho.metastore.locator.api.MetastoreLocator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 
 import java.util.List;
@@ -36,6 +40,10 @@ public class RunConfigurationManager implements RunConfigurationService {
   private List<RunConfigurationProvider> runConfigurationProviders = new ArrayList<>();
   private static RunConfigurationManager instance;
 
+  private Logger logger = LoggerFactory.getLogger( RunConfigurationManager.class );
+
+  //TODO notice between these getInstance overloadded methods RunConfigurationManager is partway between a Singleton
+  // class and not... speaking with Alan, it will not be, at all, in the future
   public static RunConfigurationManager getInstance() {
     if ( null == instance ) {
       instance = new RunConfigurationManager();
@@ -44,25 +52,40 @@ public class RunConfigurationManager implements RunConfigurationService {
   }
 
   public static RunConfigurationManager getInstance( Bowl bowl ) {
-
     CheckedMetaStoreSupplier bowlSupplier = () -> bowl != null ? bowl.getMetastore() :
-        DefaultBowl.getInstance().getMetastore();
-    RunConfigurationProvider provider = new DefaultRunConfigurationProvider( bowlSupplier );
-    List<RunConfigurationProvider> providers = new ArrayList<>();
-    providers.add( provider );
-    providers.add( new SparkRunConfigurationProvider() );
-    return new RunConfigurationManager( providers );
+      DefaultBowl.getInstance().getMetastore();
+    return new RunConfigurationManager( RunConfigurationProviderFactoryManager.getInstance().generateProviders( bowlSupplier ) );
   }
 
   public RunConfigurationManager( List<RunConfigurationProvider> runConfigurationProviders ) {
     this.runConfigurationProviders = runConfigurationProviders;
   }
 
+  //TODO working within the existing logic as best as possible, but I think we should really look into refactoring (see comment in method)
   private RunConfigurationManager() {
-    this.runConfigurationProviders.add( new SparkRunConfigurationProvider() );
-    this.defaultRunConfigurationProvider = new DefaultRunConfigurationProvider();
+    CheckedMetaStoreSupplier metaStoreSupplier = null;
+    try {
+      Collection<MetastoreLocator> metastoreLocators = PluginServiceLoader.loadServices( MetastoreLocator.class );
+      MetastoreLocator metastoreLocator = metastoreLocators.stream().findFirst().get();
+      metaStoreSupplier = metastoreLocator::getMetastore;
+    } catch ( Exception e ) {
+      logger.warn( "Error getting MetastoreLocator", e );
+    }
+    runConfigurationProviders = RunConfigurationProviderFactoryManager.getInstance().generateProviders( metaStoreSupplier );
+
+    //TODO the logic around this parameter is kind of weird, see if we can refactor it out of here and simplify things...
+    this.defaultRunConfigurationProvider = getProvider( "Pentaho" );
+
+    //TODO remove... debug messages
+    logger.info( "RunConfigurationManager loaded these providers:" );
+    runConfigurationProviders.forEach( provider -> logger.info( provider.getType() ) );
   }
 
+  /**
+   * Load the RunConfigurations present in each RunConfigurationProvider
+   *
+   * @return
+   */
   @Override public List<RunConfiguration> load() {
     List<RunConfiguration> runConfigurations = new ArrayList<>();
     for ( RunConfigurationProvider runConfigurationProvider : getRunConfigurationProviders() ) {
@@ -89,7 +112,8 @@ public class RunConfigurationManager implements RunConfigurationService {
 
   @Override
   public boolean save( RunConfiguration runConfiguration ) {
-    RunConfigurationProvider runConfigurationProvider = runConfiguration != null ? getProvider( runConfiguration.getType() ) : null;
+    RunConfigurationProvider runConfigurationProvider =
+      runConfiguration != null ? getProvider( runConfiguration.getType() ) : null;
     return runConfigurationProvider != null && runConfigurationProvider.save( runConfiguration );
   }
 
@@ -198,7 +222,8 @@ public class RunConfigurationManager implements RunConfigurationService {
     return defaultRunConfigurationProvider;
   }
 
-  public void setDefaultRunConfigurationProvider(
+  //For Testing
+  protected void setDefaultRunConfigurationProvider(
     RunConfigurationProvider defaultRunConfigurationProvider ) {
     this.defaultRunConfigurationProvider = defaultRunConfigurationProvider;
   }

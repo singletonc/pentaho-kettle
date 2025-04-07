@@ -198,9 +198,6 @@ public class RunConfigurationManager implements RunConfigurationService {
 
   public List<RunConfigurationProvider> getRunConfigurationProviders( String type ) {
     List<RunConfigurationProvider> runConfigurationProviders = new ArrayList<>();
-    if ( defaultRunConfigurationProvider != null ) {
-      runConfigurationProviders.add( defaultRunConfigurationProvider );
-    }
     for ( RunConfigurationProvider runConfigurationProvider : this.runConfigurationProviders ) {
       if ( runConfigurationProvider.isSupported( type ) ) {
         runConfigurationProviders.add( runConfigurationProvider );
@@ -211,9 +208,6 @@ public class RunConfigurationManager implements RunConfigurationService {
 
   public List<RunConfigurationProvider> getRunConfigurationProviders() {
     List<RunConfigurationProvider> runConfigurationProviders = new ArrayList<>();
-    if ( defaultRunConfigurationProvider != null ) {
-      runConfigurationProviders.add( defaultRunConfigurationProvider );
-    }
     runConfigurationProviders.addAll( this.runConfigurationProviders );
     return runConfigurationProviders;
   }

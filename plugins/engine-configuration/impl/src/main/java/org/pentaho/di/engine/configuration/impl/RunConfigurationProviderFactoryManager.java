@@ -47,7 +47,7 @@ public class RunConfigurationProviderFactoryManager {
 
     //TODO remove this line when we have finished moving Spark classes into its own plugin and registration happens
     // there
-    RunConfigurationProviderFactoryManager.getInstance().registerFactory( new SparkRunConfigurationProviderFactory() );
+    factories.add( new SparkRunConfigurationProviderFactory() );
   }
 
   /**
